@@ -18,6 +18,10 @@ module Mundipagg
 		# @return [Symbol] Webservice environment.
 		attr_accessor :environment
 
+    # Certificate file used for SSL verification on Savon SOAP client
+    # @see http://savonrb.com/version2/globals.html (section SSL)
+    attr_accessor :ssl_certificate_file
+
 		# @return [String] URL that points to the simulator WSDL
 		@@WEBSERVICE_TEST_URL = 'https://transaction.mundipaggone.com/MundiPaggService.svc?wsdl'
 
@@ -374,25 +378,24 @@ module Mundipagg
 				@log_level = :none
 			end
 
-			level = :debug
-			enable_log = true
-			filters = [:CreditCardNumber,
-			           :SecurityCode,
-			           :MerchantKey]
+      client_options = {
+        wsdl: url,
+        log: true,
+        log_level: :debug,
+        filters: [:CreditCardNumber, :SecurityCode, :MerchantKey],
+        namespaces: { 'xmlns:mun' => 'http://schemas.datacontract.org/2004/07/MundiPagg.One.Service.DataContracts' }
+      }
 
 			if @log_level == :none
-				level = :error
-				enable_log = false
+				client_options[:log_level] = :error
+				client_options[:log] = false
 			end
 
+      if @ssl_certificate_file
+        client_options[:ssl_cert_file] = @ssl_certificate_file
+      end
 
-			client = Savon.client do
-				wsdl url
-				log enable_log
-				log_level level
-				filters filters
-				namespaces 'xmlns:mun' => 'http://schemas.datacontract.org/2004/07/MundiPagg.One.Service.DataContracts'
-			end
+			client = Savon.client(client_options)
 
 			response = client.call(service_method) do
 				message hash

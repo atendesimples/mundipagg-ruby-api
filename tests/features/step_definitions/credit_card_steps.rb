@@ -1,6 +1,8 @@
 
 #Scenario 1:
 Before do
+  @mocks = Object.new
+  RSpec::Mocks.setup @mocks
 
 	@client = Mundipagg::Gateway.new :test
 	@client.log_level = :debug
@@ -141,5 +143,29 @@ When(/^I pay another order with the instant buy key$/) do
   ensure
     $stdout = old_stdout
   end
+end
+
+Given(/^I set SSL certificate file$/) do
+  @client.ssl_certificate_file = 'sample_certificate.crt'
+end
+
+Given(/^Savon client is mocked$/) do
+  savon_client = @mocks.double(call: {}, fetch: {})
+  savon_options = {
+    wsdl: 'https://transaction.mundipaggone.com/MundiPaggService.svc?wsdl',
+    log: true,
+    log_level: :debug,
+    filters: [:CreditCardNumber, :SecurityCode, :MerchantKey],
+    namespaces: { 'xmlns:mun' => 'http://schemas.datacontract.org/2004/07/MundiPagg.One.Service.DataContracts' },
+    ssl_cert_file: 'sample_certificate.crt'
+  }
+
+  RSpec::Mocks.allow_message(Savon, :client).and_call_original
+  RSpec::Mocks.expect_message(Savon, :client).with(savon_options).
+    and_return savon_client
+end
+
+Then(/^it must send SSL certificate$/) do
+  RSpec::Mocks.verify
 end
 

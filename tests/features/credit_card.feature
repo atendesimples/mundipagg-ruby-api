@@ -35,3 +35,11 @@ Feature: Credit Card Transaction
 	   And I will send to Mundipagg
 	   Then the order amount in cents should be 30000
 	   And the transaction status should be Captured
+
+    Scenario: Pay an order setting SSL certificate
+      Given I have purchase three products with a total cost of BRL 100,29
+      And I set SSL certificate file
+      And Savon client is mocked
+      And I will pay using a Visa credit card without installment
+      And I will send to Mundipagg
+      Then it must send SSL certificate
