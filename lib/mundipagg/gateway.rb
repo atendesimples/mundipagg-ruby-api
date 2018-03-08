@@ -208,7 +208,7 @@ module Mundipagg
 				'mun:Name' => request.buyer.name,
 				'mun:PersonTypeEnum' => request.buyer.personTypeEnum,
 				'mun:TaxDocumentNumber' => request.buyer.taxDocumentNumber,
-				'mun:TaxDocumentNumberTypeEnum' => request.buyer.taxDocumentTypeEnum,
+				'mun:TaxDocumentTypeEnum' => request.buyer.taxDocumentTypeEnum,
 				'mun:TwitterId' => request.buyer.twitterId,
 				'mun:WorkPhone' => request.buyer.workPhone,
 				'mun:BuyerAddressCollection' => nil
